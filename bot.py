@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 # Bot configuration from environment variables
 API_ID = int(os.getenv("API_ID", "24168862"))
 API_HASH = os.getenv("API_HASH", "916a9424dd1e58ab7955001ccc0172b3")
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8275315149:AAG4rS7B6PVw1LmsKt82urYIjA_FzSdMPBQ")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8215366891:AAHHTn61PY2uMDmBnurZP6kWIc1Kp2lCd44")
 
 ADMIN_ID = int(os.getenv("ADMIN_ID", "6421770811"))
 LOG_GROUP_ID = int(os.getenv("LOG_GROUP_ID", "-1002023049910"))
