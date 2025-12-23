@@ -5,7 +5,8 @@ import asyncio
 import random
 import string
 from datetime import datetime, timedelta
-from pyrogram import Client, filters
+from pyrogram import Client, filters, idle
+from pyrogram.enums import ParseMode
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from pyrogram.errors import BadRequest, ChatAdminRequired, UserNotParticipant, ChatWriteForbidden
 import zipfile
@@ -21,16 +22,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Configure logging
+# ---------- LOGGING ----------
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('bot.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    handlers=[logging.FileHandler("bot.log"), logging.StreamHandler()]
 )
-logger = logging.getLogger(__name__)
+
+logger = logging.getLogger("NottyBot")
+
 
 # Bot configuration from environment variables
 API_ID = int(os.getenv("API_ID", "24168862"))
@@ -48,19 +48,39 @@ MUST_JOIN_LINK = "https://t.me/ZeeMusicUpdate"
 
 logger.info("Configuration loaded from environment variables.")
 
-logger.info("Connecting to your Mongo Database...")
-try:
-    mongo_async = AsyncIOMotorClient(MONGO_DB_URI)
-    mongodb = mongo_async.Anon
-    logger.info("Connected to your Mongo Database.")
-except Exception as e:
-    logger.error(f"Failed to connect to your Mongo Database: {e}")
-    exit()
+DB_NAME = "Anon"
+
+# ---------- MONGO ----------
+logger.info("Connecting to MongoDB...")
+mongo = AsyncIOMotorClient(MONGO_DB_URI)
+db = mongo[DB_NAME]
+logger.info("MongoDB connected ✅")
 
 # Initialize the bot
-app = Client("session_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+# ---------- BOT ----------
+class Notty(Client):
+    def __init__(self):
+        super().__init__(
+            name="NottyBot",
+            api_id=API_ID,
+            api_hash=API_HASH,
+            bot_token=BOT_TOKEN,
+            in_memory=True,
+        )
 
-# MongoDB Collections
+    async def start(self):
+        await super().start()
+        me = await self.get_me()
+        logger.info(f"Bot started as @{me.username}")
+        await self.send_message(LOG_GROUP_ID, "✅ Bot Started")
+
+    async def stop(self):
+        await super().stop()
+        logger.info("Bot stopped")
+
+app = Notty()
+
+        # MongoDB Collections
 users_collection = mongodb.users
 sessions_collection = mongodb.sessions
 countries_collection = mongodb.countries
